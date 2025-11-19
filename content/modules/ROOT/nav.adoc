@@ -1,7 +1,6 @@
-* xref:module-01.adoc[1. RPM Native Container]
-** xref:module-01.adoc#repositories[Repositories]
-** xref:module-01.adoc#software[Software]
-
-* xref:module-02.adoc[2. GitHub Sourced Container]
-** xref:module-02.adoc#prerequisites[Install Prerequisites]
-** xref:module-02.adoc#container[Enable Container]
+* xref:index.adoc[Introduction]
+* xref:module-01-install.adoc[Installing and configuring Veeam Kasten K10]
+* xref:module-02-location-profile.adoc[Setting up location profiles for backups]
+* xref:module-03-backup-restore.adoc[Protecting Virtual Machines]
+* xref:module-04-multicluster.adoc[Configuring Multi-Cluster]
+* xref:module-05-mobility.adoc[Migrating Workloads]
