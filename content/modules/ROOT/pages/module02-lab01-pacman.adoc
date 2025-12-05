@@ -1,0 +1,75 @@
+= Lab 1 - Deploy a workload
+:toc:
+
+== 1. Deploying Pacman with Helm
+
+====
+[IMPORTANT]
+
+In this module, we will be deploying a containerized application. Ensure that you create a new, different namespace than what you may have created in the previous module (`kasten-lab-{user}`) in the previous lab, we suggest kasten-lab-{user}-pacman. This will ensure that the application is isolated from the previous lab and can be easily managed.
+====
+. Add a new namespace for the Pacman application
++
+[source,bash]
+----
+oc create namespace `kasten-lab-{user}-pacman`
+----
+. Add the repository to install Pacman:
++
+....
+helm repo add pacman https://shuguet.github.io/pacman/
+helm repo update
+....
+. Run the following to install the `pacman/pacman` Helm Chart:
++
+[source,bash]
+----
+helm install pacman pacman/pacman -n kasten-lab-{user}-pacman \
+--set route.create=true \
+--set mongodb.containerSecurityContext.enabled=false \
+--set mongodb.podSecurityContext.enabled=false \
+--set containerSecurityContext.runAsNonRoot=true
+----
++
+_It will take a few moments for the command to return, this is normal!_
+. Return to the OpenShift Console in your browser and verify the Chart has successfully provisioned 3 Pods, `pacman-++*++` and `pacman-mongodb-++*++`
++
+.pacman pods
+image::module02-lab01-pacman/pacman_pods.png[pacman pods]
++
+====
+[NOTE]
+
+Ensure you have the `kasten-lab-{user}-pacman` project selected in the Project drop-down
+====
+
+== 2. Let’s Play some Pacman
+
+[arabic]
+. Now that our pacman application has been deployed, let’s play some pacman. First we need to access the Pacman front end. To find the URL, within the OpenShift console and navigate within the OpenShift console to Networking ++>++ Routes
+. Ensure you have the pacman project selected. You should see an entry named pacman-route
++
+.pacman route
+image::module02-lab01-pacman/pacman_route.png[pacman route]
+. Click on the Location to launch pacman
++
+====
+[NOTE]
+
+If pacman doesn’t load in the browser, ensure that the address bar is using HTTP (http://pacman-route-pacman), _not_ HTTPS ++>++ Occasionally browsers may try to force you to an HTTPS page which will not work for our default pacman app
+====
+. Play a short game, and enter your name once you’re done to add your name to the leaderboard.
++
+.pacman game
+image::module02-lab01-pacman/pacman_game.png[pacman game]
++
+.pacman leaderboard
+image::module02-lab01-pacman/pacman_leaderboard.png[pacman leaderboard]
+
+== 3. Takeaways
+
+* Deploying applications from helm charts is quick and easy
+* OpenShift makes exposing applications via routes simple
+* Pacman is still fun
+
+Continue to LAB 2

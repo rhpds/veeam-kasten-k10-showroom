@@ -1,0 +1,102 @@
+= Lab 3 - Backup and Restore a Workload
+:toc:
+
+== 1. Peform a backup
+
+
+[arabic]
+. Under Policies, click _run once_ on the policy you created in lab 2, entitled _pacman-backup_
++
+.Run Once
+image::module02-lab02-backup-recovery/policy_run_once.png[Run Once]
+. When prompted, leave the "`Snapshot Expiration (Optional)`" field blank and select, _Yes, Continue_
++
+.Run Once Continue
+image::module02-lab02-backup-recovery/run_once_continue.png[Run Once Continue]
+. Click *++<++ Dashboard* in the upper-left corner to monitor the action on the main dashboard
++
+.Running Action
+image::module02-lab02-backup-recovery/running_action.png[Running Action]
+. Click on the running action to monitor its detailed status
++
+.Action Details
+image::module02-lab02-backup-recovery/action_details.png[Action Details]
+. After a few minutes, all steps of the action should run successfully
++
+.Action Completed
+image::module02-lab02-backup-recovery/action_completed.png[Action Completed]
+
+== 2. Simulated Attack
+
+[arabic]
+. Return to the Pacman tab in your browser and click "`View Highscore List`" or if the game is playing, hit the space bar and click *High Score*
++
+.Leaderboard
+image::module02-lab02-backup-recovery/pacman_leaderboard.png[Leaderboard]
+. From the bastion host, drop the `pacman` database from MongoDB that holds your highscore:
++
+[source,bash]
+----
+export MONGODB_ROOT_PASSWORD=$(oc get secret -n kasten-lab-{user}-pacman pacman-mongodb -o jsonpath="{.data.mongodb-root-password}" | base64 --decode)
+oc exec -it deploy/pacman-mongodb -n kasten-lab-{user}-pacman -- mongosh pacman --authenticationDatabase admin -u root -p $MONGODB_ROOT_PASSWORD --eval 'db.dropDatabase();'
+----
++
+====
+[IMPORTANT]
+
+This command is simulating a data compromise event, which could be something as innocent as an administrator ++>++ accidentally dropping a table or database, or as nefarious as a ransomware attack
+====
+. Return to the Pacman tab in your browser and refresh the page. Click *High Score*. *!!OH NO YOUR HIGH SCORE IS GONE!!*
++
+.no high scores
+image::module02-lab02-backup-recovery/no_highscores.png[no high scores]
+
+== 3. Recover Our Score
+
+[arabic]
+. No fear, let’s restore our backup. Click on the Kasten tab in your browser and return to the main dashboard by clicking on **Dashboard**
+. Click *Compliant* in the Applications modal.
++
+.Compliant
+image::module02-lab02-backup-recovery/compliant.png[Compliant]
+. Click Restore on the Pacman application to restore from backup
++
+.Restore
+image::module02-lab02-backup-recovery/restore.png[Restore]
+. Click the most recent backup.
++
+====
+[IMPORTANT]
+ There are two options from which to restore. The blue box is the local cluster backup, whereas the green box with the title "Exported" is the exported backup which is stored on our S3 object storage. In the event of an accidental deletion, restoring from local cluster backup is sufficient, but if we were facing the result of a ransomware attack we would likely want to restore from the S3 bucket. For the purposes of this lab, we’ll just the local cluster backup since restore time will be slightly faster
+====
++
+Click Today, &#35;:&#35;&#35; in the _blue box_ to restore from the local cluster snapshot
++
+.Restore Today
+image::module02-lab02-backup-recovery/restore_today.png[Restore Today]
+. Scroll down and click *Deselect All Artifacts* then click the tick box next to the _pacman-mongodb_ item under the _Snapshot (1)_ section
++
+.Restore Volume
+image::module02-lab02-backup-recovery/volume_only_restore.png[Restore Volume]
+. Click *Restore*.
+. Click *Restore* when prompted.
+. Return to the Dashboard by clicking on the **Dashboard** link in the upper left corner
+. Click on the running Restore Action to monitor the action
+. After a minute or two all phases should complete successfully
++
+.Restore Completed
+image::module02-lab02-backup-recovery/restore_completed.png[Restore Completed]
+. Return to the pacman tab and refresh the browser tab. Click *High Score*. Our high score is back! *REJOICE!*
++
+.Leaderboard
+image::module02-lab02-backup-recovery/pacman_leaderboard.png[Leaderboard]
+
+== 4. Takeaways
+
+* Kasten automatically interrogates and detects namespaces on the cluster
+* Backup jobs are configured on a per-namespace basis and can be configured quickly
+* We can easily monitor actions via the Kasten UI
+* We have granular control on how we restore from backup, including whether from on-cluster or exported storage
+* We have granular control over which components we wish to recover and/or overwrite
+
+Continue to LAB 4

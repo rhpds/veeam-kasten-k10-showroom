@@ -1,0 +1,17 @@
+= Module 01 - Introduction to Veeam Kasten for OpenShift Virtualization
+
+== 1. Introduction
+
+This lab guide is intended to familiarize practitioners with the protection of OpenShift Virtualization workloads using *_Veeam Kasten for Kubernetes_*.
+It assumes the learner is familiar with virtual machine provisioning and management in OpenShift.
+
+== 2. How does Kasten work?
+
+image::module01-lab01-install/00.png[]
+
+. Kasten is deployed to the cluster that it protects.
+Within the cluster, Kasten communicates with the Kubernetes API server to discover applications and VMs and their resources.
+. Kasten orchestrates point-in-time snapshots of complete applications, including both VM and application manifest data and storage volume data.
+. Kasten exports portable copies of the point-in-time snapshot to an external object, NFS, or Veeam repository.
+. If leveraging Veeam Backup & Replication as a target, file-level recovery of the VM data is also supported via the VBR console.
+. Kasten has built-in capabilities to optimize backup performance when using Red Hat OpenShift Data Foundation (RHODF), where only changed data is transferred to the backup target, significantly reducing backup times and storage requirements.

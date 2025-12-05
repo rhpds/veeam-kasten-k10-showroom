@@ -2,13 +2,13 @@
 
 == Introduction
 
-OpenShift Virtualization enables you to bring virtual machines onto a modern, Kubernetes-based infrastructure. It enables the development and delivery of new applications as well as the modernization of existing ones and can create applications that consist of virtual machines, containers, and serverless functions - all managed together using Kubernetes-native tools and paradigms.
+Veeam Kasten is a Kubernetes-native data protection platform designed to secure, manage, and recover containerized applications and VMs, offering a unified approach to backup, disaster recovery, and application mobility. By leveraging OpenShift’s hybrid cloud infrastructure, Kasten ensures consistent data protection policies across environments, enabling organizations to meet compliance requirements and maintain business continuity with minimal operational overhead.
 
-In this lab we will explore disaster recovery, backup and restore of Virtual Machines using the Veeam Kasten K10 product.
+In this lab we will explore disaster recovery, backup and restore of Virtual Machines (Module 1) and Containers (Module 2) on OpenShift using the Veeam Kasten product.
 
 == What Content Is Covered In The Lab?
 
-These are the *five* main sections that will be covered:
+=== Module 1 - Protecting Virtual Machines on OpenShift with Veeam Kasten
 
 * _Installing Veeam Kasten_: In this section we will provide a review of how to install the product on any OpenShift cluster. Since the product is already installed in the lab environment this sectionwill be a review only.
 
@@ -19,6 +19,16 @@ These are the *five* main sections that will be covered:
 * _Optional: Configuring Multi Cluster_: In this section you will learn how to set up Kasten Multi-Cluster Manager. Since our lab environment is a single cluster this section will be review only.
 
 * _Optional: Migrating Workloads_: This section addresses restoring backups to different clusters. Since our lab environment is a single cluster this section will be review only.
+
+=== Module 2 - Protecting Containerized Workloads with Veeam Kasten
+
+* _Deploy a Sample Application_: In this section we will deploy a sample application to OpenShift.
+
+* _Configure Kasten for Backup_: In this section we will configure Kasten to use an S3-compatible object store for backup.
+
+* _Backup and Recover our Application_: In this section we will perform backup and recovery operations on the sample application.
+
+* _Provide Application Consistent Backups via Kasten Blueprints_: In this section we will explore how to use Kasten Blueprints to provide application consistent backups of our sample application.
 
 == Version Information
 

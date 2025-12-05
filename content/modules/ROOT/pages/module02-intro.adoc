@@ -1,0 +1,16 @@
+= Module 2 - Protecting Containerized Workloads with Veeam Kasten
+
+== 1. Introduction
+
+This lab guide is intended to familiarize practitioners with the protection of OpenShift containerized workloads using *_Veeam Kasten for Kubernetes_*.
+It assumes the learner is familiar with container provisioning, whether via OpenShift Operator or via helm, and management in OpenShift.
+
+== 2. How does Kasten work?
+
+image::module01-lab01-install/00.png[]
+
+. Kasten is deployed to the cluster that it protects.
+Within the cluster, Kasten communicates with the Kubernetes API server to discover applications and VMs and their resources.
+. Kasten orchestrates point-in-time snapshots of complete applications, including both VM and application manifest data and storage volume data.
+. Kasten exports portable copies of the point-in-time snapshot to an external object, NFS, or Veeam repository.
+. Kasten provides application consistent and logical backups via https://kanister.io[Kanister Blueprints], which allow users to define backup policies that ensure all components of an application are captured in a consistent state.

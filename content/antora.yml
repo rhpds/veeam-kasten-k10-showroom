@@ -1,14 +1,26 @@
+---
 name: modules
-title: Backup/DR with Veeam Kasten K10
+title: Backup/DR/Mobility with Veeam Kasten
 version: master
 nav:
-  - modules/ROOT/nav.adoc
+- modules/ROOT/nav.adoc
 
 asciidoc:
   attributes:
-    lab_name: Backup/DR with Veeam Kasten K10
+    lab_name: Backup/DR/Mobility with Veeam Kasten
     release-version: master
     page-pagination: true
+    user: user1
+    password: redhat
+    kasten_dashboard: https://kasten.example.com
+    openshift_console_url: https://console.example.com
+    kasten_storageclass: ocs-storagecluster-ceph-rbd-virtualization
+    mongodb_root_password: testpass
+    kasten_backup_bucket_host: bucket.example.com
     page-links:
     - url: https://redhat.com
       text: Red Hat
+
+  extensions:
+  - ./content/lib/tab-block.js
+  - ./content/lib/remote-include-processor.js
