@@ -21,30 +21,17 @@ While you do have access to the `kasten-io` namespace *PLEASE DO NOT MODIFY ANYT
 +
 image::module01-lab01-install/02.png[]
 +
-====
-[NOTE]
-
-Alternate versions of the Kasten operator are available for use if transacting Kasten licensing through the Red Hat Marketplace.
-
-If desired, Kasten may also be https://docs.kasten.io/latest/install/openshift/helm.html#helm-based-installation[installed on OpenShift via Helm chart].
-====
 
 . Under *_Version_*, select `7.0.12` from the dropdown menu, and click *_Install_*.
 +
 image::module01-lab01-install/02b.png[]
 +
-====
-[IMPORTANT]
-
-It's recommended to always run the latest available version of Kasten.
-Explicitly selecting version `7.0.12` is to ensure consistent instructions and corresponding screenshots in this lab guide.
-====
 
 . Under *_Update approval_* select *_Manual_* and then click *_Install_* to initiate operator installation.
 +
 image::module01-lab01-install/03.png[]
 
-. When prompted, click *_Approve_* to proceed with operator installation.
+. Wait for the operator to complete installation
 +
 image::module01-lab01-install/03b.png[]
 

@@ -34,9 +34,9 @@ In this lab we will explore disaster recovery, backup and restore of Virtual Mac
 
 This edition of the lab has been developed using the following software versions:
 
-* Red Hat OpenShift 4.16.x
-* Red Hat OpenShift Virtualization 4.16.x
-* Veeam Kasten K10 7.0.12
+* Red Hat OpenShift 4.18.x
+* Red Hat OpenShift Virtualization 4.18.x
+* Veeam Kasten K10 8.0.15
 
 == Requirements for the Lab Environment
 
