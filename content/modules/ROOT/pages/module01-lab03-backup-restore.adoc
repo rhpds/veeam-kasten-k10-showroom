@@ -32,7 +32,7 @@ image::module01-lab03-backup_restore/03.png[]
 Kasten can be used to protect VMs provisioned using a `Template` as well without any additional configuration.
 ====
 
-. Under *_Select Volume to boot from_*, select the `centos-stream9` volume.
+. Under *_Select Volume to boot from_*, select the `fedora` volume.
 +
 ====
 [NOTE]

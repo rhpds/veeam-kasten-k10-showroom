@@ -13,7 +13,7 @@ All of the objects in the namespace are also captured (e.g. deployment, secrets,
 Because these backups are performed via storage-based snapshots, they are known as *Crash Consistent Backups*
 
 .Crash Consistent
-image::module02-lab03-blueprints/crash-consistent-diagram.png[Crash Consistent]
+image::module02-lab04-blueprints/crash-consistent-diagram.png[Crash Consistent]
 
 While this is great for our demo purposes and some applications, there are many workloads that require disk operations to be in a quiesced state during backup, otherwise there is a risk of data corruption which can cause issues upon restore.
 
@@ -22,7 +22,7 @@ One such workload is *MongoDB*, which is the database backing our high scores in
 Alternatively, rather than a storage-centric PVC backup, we could use app-specific native tools (e.g. `mongodump` and `mongorestore`) to directly export and restore data into our MongoDB at the same time we take a backup of our Kubernetes objects (deployments, secrets, configmaps, etc), which would be a *Logical Backup*
 
 .Backup Types
-image::module02-lab03-blueprints/backup_reliability.png[Backup Types]
+image::module02-lab04-blueprints/backup_reliability.png[Backup Types]
 
 Fortunately Kasten has the capability to leverage a construct called https://docs.kasten.io/latest/kanister/testing.html#installing-applications-and-blueprints[Kanister Blueprints], which provides a standardized way to perform more advanced operations for application consistent and logical backups.
 
@@ -36,8 +36,8 @@ The good news is our Pacman application leverages an underlying Bitnami instance
 . Within the Kasten UI, navigate to *Blueprints  Blueprints* in the side menu
 +
 .Blueprints UI
-image::module02-lab03-blueprints/blueprint_ui.png[Blueprints UI]
-. Click *{plus} Add Blueprint*
+image::module02-lab04-blueprints/blueprint_ui.png[Blueprints UI]
+. Click *{plus} Create New Blueprint*
 . Paste the following into the YAML prompt:
 
 [source,yaml]
@@ -100,11 +100,11 @@ actions:
 . Click *Validate and Save*
 +
 .Validate and Save
-image::module02-lab03-blueprints/validate-and-save.png[Validate and Save]
+image::module02-lab04-blueprints/validate-and-save.png[Validate and Save]
 . A new Blueprint named `mongo-hooks` should appear within the *Blueprints* list
 +
 .Blueprints List
-image::module02-lab03-blueprints/blueprints_list.png[Blueprints List]
+image::module02-lab04-blueprints/blueprint_bindings_list.png[Blueprints List]
 
 == 3. Binding our Blueprint
 
@@ -126,12 +126,12 @@ Now that we have created our *Blueprint* we need to bind it to our application s
 . We’ll now specify a constraint to ensure that our blueprint is bound to our application. We’ll use a simple "`*Match All Constraints*`" constraint to apply our blueprint to our pacman application via namespace. Click *Add New Constraint* and select *Namespace* in the drop-down list:
 +
 .Blueprint Constraints
-image::module02-lab03-blueprints/blueprint_constraints.png[Blueprint Constraints]
+image::module02-lab04-blueprints/blueprint_constraints.png[Blueprint Constraints]
 . Leave the default Operator of *In* and specify the namespace *kasten-lab-{user}-pacman*
 . Still in the *Match All Constraints* pane, click *Add New Constraint* and select *Type*
 +
 .Add New Constraint
-image::module02-lab03-blueprints/blueprint_add_new_constraint.png[Add New Constraint]
+image::module02-lab04-blueprints/blueprint_add_new_constraint.png[Add New Constraint]
 . Leave the default Operator of *In* and specify *Type*
 . For the *Type* Constraint, specify the following:
 +
@@ -143,12 +143,12 @@ image::module02-lab03-blueprints/blueprint_add_new_constraint.png[Add New Constr
 |===
 . Click *Next*
 +
-image::module02-lab03-blueprints/blueprint_binding_confirm.png[Confirm Blueprint Binding]
+image::module02-lab04-blueprints/blueprint_binding_confirm.png[Confirm Blueprint Binding]
 +
 . Click *_Submit_*
 +
 .Blueprint Bindings List
-image::module02-lab03-blueprints/blueprint_bindings_list.png[Blueprint Bindings List]
+image::module02-lab04-blueprints/blueprint_bindings_list.png[Blueprint Bindings List]
 +
 ====
 [NOTE]
@@ -157,20 +157,20 @@ Rather than use bindings via the UI, we could simply annotate the deployment to 
 . Using the navigation menu to the left, click *Applications* then click on *kasten-lab-{user}-pacman* in the list. A modul will appear outlining the application components, and you should see the blueprint we just created automatically bound to the *pacman-mongodb* deployment:
 +
 .Pacman-MongoDB Binding
-image::module02-lab03-blueprints/pacman-mongodb-binding.png[Pacman-MongoDB Binding]
+image::module02-lab04-blueprints/pacman-mongodb-binding.png[Pacman-MongoDB Binding]
 +
 Now when we run our previously configured backup job *kasten-lab-{user}-pacman*, our blueprint will automatically run to pause database operations on our Pacman score database.
 . Close the *Application Details* modul by clicking the *X* in the upper right corner and navigate to *Policies* using the left-hand pane.
 . Click *Run Once* on the *kasten-lab-{user}-pacman* policy
 +
 .Run Pacman-Backup
-image::module02-lab03-blueprints/pacman-backup_runonce.png[Run Pacman-Backup]
+image::module02-lab04-blueprints/pacman-backup_runonce.png[Run Pacman-Backup]
 . Click *Yes, Continue* when prompted.
 . Click on *Dashboard* in the left navigate pane to monitor the backup policy run action and under the *Actions* section, click on the running *Policy Run* action.
 . All phases should complete successfully and we have taken an *Application Consistent* backup of our Pacman Application. Rejoice!
 +
 .Pacman Backup Completed
-image::module02-lab03-blueprints/pacman-backup_completed.png[Pacman Backup Completed]
+image::module02-lab04-blueprints/pacman-backup_completed.png[Pacman Backup Completed]
 
 == 4. Takeaways
 

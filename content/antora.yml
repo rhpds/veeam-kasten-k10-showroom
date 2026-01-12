@@ -10,9 +10,12 @@ asciidoc:
     lab_name: Backup/DR/Mobility with Veeam Kasten
     release-version: master
     k10_version: 8.0.15
+    user: user1
+    password: user1password
     page-pagination: true
     kasten_storageclass: ocs-external-storagecluster-ceph-rbd
     mongodb_root_password: testpass
+    openshift_console_url: console-openshift-console.apps.cluster-qrsbv.dynamic.redhatworkshops.io/dashboards
     kasten_backup_bucket_host: bucket.example.com
     page-links:
     - url: https://redhat.com

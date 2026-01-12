@@ -155,7 +155,7 @@ See https://docs.kasten.io/latest/api/profiles.html[docs.kasten.io] for complete
 
 . In the *_Kasten Dashboard_*, select *_Applications_* to view all discovered namespaces.
 +
-image::module02-lab03-backup_restore/07.png[]
+image::module02-lab02-configure/07.png[]
 +
 Your `kasten-lab-{user}-pacman` application should appear as *_Unmanaged_*, indicating it is not being protected by any policy.
 +
@@ -166,7 +166,7 @@ You will notice that you don't see any namespaces starting with `openshift` in t
 
 Namespaces, including the `+openshift-...+` system namespaces can be excluded from the *_Applications_* list (and compliance reporting) by adding a list of `excludedApps` to the K10 Operand `spec`, as shown:
 
-image::module02-lab03-backup_restore/08.png[]
+image::module01-lab03-backup_restore/08.png[]
 
 The following command can be used to produce a properly formatted list of namespaces beginning with `openshift` that can be copy/paste into the K10 Operand YAML tab:
 
@@ -181,17 +181,17 @@ Your lab environment has already been configured to exclude system namespaces.
 
 . Click `kasten-lab-{user}-pacman` in the *_Applications_* list to view details about the workloads and additional resources discovered within the namespace.
 +
-image::module02-lab03-backup_restore/09.png[]
+image::module02-lab02-configure/09.png[]
 
 . Close the *_Application Details_* window.
 . Under `kasten-lab-{user}-pacman`, select *_...
 → Create a Policy_*.
 +
-image::module02-lab03-backup_restore/10.png[]
+image::module02-lab02-configure/10.png[]
 
 . Leave the defaults for *_Name_* and *_Action_*.
 +
-image::module02-lab03-backup_restore/11.png[]
+image::module02-lab02-configure/11.png[]
 +
 ====
 [NOTE]
@@ -201,7 +201,7 @@ Policy Presets provide the option of allowing administrators to define SLA-focus
 
 . Leave the default *_Hourly Backup Frequency_* and *_Snapshot Retention_* values.
 +
-image::module02-lab03-backup_restore/12.png[]
+image::module01-lab03-backup_restore/12.png[]
 +
 ====
 [NOTE]
@@ -214,7 +214,7 @@ image::module02-lab03-backup_restore/12.png[]
 
 . Toggle *_Enable Backups via Snapshot Exports_* and select `kastenbackups-{user}` as the *_Export Location Profile_*.
 +
-image::module02-lab03-backup_restore/13.png[]
+image::module01-lab03-backup_restore/13.png[]
 +
 ====
 [NOTE]
@@ -227,7 +227,7 @@ This can be configured under *_Advanced Export Settings_*.
 
 . Under *_Select Applications_*, verify the `kasten-lab-{user}-pacman` namespace has been selected.
 +
-image::module02-lab03-backup_restore/14.png[]
+image::module01-lab03-backup_restore/14.png[]
 +
 ====
 [NOTE]
