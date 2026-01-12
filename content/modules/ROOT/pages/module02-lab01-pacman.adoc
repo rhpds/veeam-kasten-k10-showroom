@@ -17,7 +17,7 @@ oc create namespace `kasten-lab-{user}-pacman`
 . Add the repository to install Pacman:
 +
 ....
-helm repo add pacman https://shuguet.github.io/pacman/
+helm repo add pacman https://michaelhaigh.github.io/pacman/
 helm repo update
 ....
 . Run the following to install the `pacman/pacman` Helm Chart:

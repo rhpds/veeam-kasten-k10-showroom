@@ -55,11 +55,11 @@ actions:
         mongoDbSecret:
           kind: Secret
           name: 'pacman-mongodb'
-          namespace: '{{ .Deployment.Namespace }}'
+          namespace: '{{ .StatefulSet.Namespace }}'
       args:
-        namespace: "{{ .Deployment.Namespace }}"
-        pod: "{{ index .Deployment.Pods 0 }}"
-        container: mongodb
+        namespace: "{{ .StatefulSet.Namespace }}"
+        pod: "{{ index .StatefulSet.Pods 0 }}"
+        container: pacman-mongodb
         command:
         - bash
         - -o
@@ -78,11 +78,11 @@ actions:
         mongoDbSecret:
           kind: Secret
           name: 'pacman-mongodb'
-          namespace: '{{ .Deployment.Namespace }}'
+          namespace: '{{ .StatefulSet.Namespace }}'
       args:
-        namespace: "{{ .Deployment.Namespace }}"
-        pod: "{{ index .Deployment.Pods 0 }}"
-        container: mongodb
+        namespace: "{{ .StatefulSet.Namespace }}"
+        pod: "{{ index .StatefulSet.Pods 0 }}"
+        container: pacman-mongodb
         command:
         - bash
         - -o
@@ -111,11 +111,10 @@ image::module02-lab03-blueprints/blueprints_list.png[Blueprints List]
 Now that we have created our *Blueprint* we need to bind it to our application so that it is automatically run during backup, export, and restore operations.
 
 [arabic]
-. Using the side menu, navigate to *Blueprints  Bindings*
+. Using the side menu, navigate to *Blueprints* -> *Bindings*
 +
 .Blueprint Bindings UI
-image::module02-lab03-blueprints/blueprint_bindings_ui.png[Blueprint Bindings UI]
-. Click *{plus} Add New*
+. Click *{plus} Create New Binding*
 . Specify the following:
 +
 |===
@@ -139,26 +138,30 @@ image::module02-lab03-blueprints/blueprint_add_new_constraint.png[Add New Constr
 |===
 |*Group* | leave blank |
 |*Version* | leave blank |
-|*Resource* | deployments |
+|*Resource* | statefulsets |
 |*Name* | pacman-mongodb |
 |===
-. Click *Submit*
+. Click *Next*
++
+image::module02-lab03-blueprints/blueprint_binding_confirm.png[Confirm Blueprint Binding]
++
+. Click *_Submit_*
 +
 .Blueprint Bindings List
 image::module02-lab03-blueprints/blueprint_bindings_list.png[Blueprint Bindings List]
 +
 ====
 [NOTE]
-Rather than use bindings via the UI, we could simply annotate the deployment to point it to the `mongo-hook`  blueprint we created earlier `kubectl annotate deployment pacman-mongodb kanister.kasten.io/blueprint='mongo-hooks' -n kasten-lab-{user}-pacman`
+Rather than use bindings via the UI, we could simply annotate the deployment to point it to the `mongo-hook`  blueprint we created earlier `kubectl annotate statefulset pacman-mongodb kanister.kasten.io/blueprint='mongo-hooks' -n kasten-lab-{user}-pacman`
 ====
-. Using the navigation menu to the left, click *Applications* then click on *Pacman* in the list. A modul will appear outlining the application components, and you should see the blueprint we just created automatically bound to the *pacman-mongodb* deployment:
+. Using the navigation menu to the left, click *Applications* then click on *kasten-lab-{user}-pacman* in the list. A modul will appear outlining the application components, and you should see the blueprint we just created automatically bound to the *pacman-mongodb* deployment:
 +
 .Pacman-MongoDB Binding
 image::module02-lab03-blueprints/pacman-mongodb-binding.png[Pacman-MongoDB Binding]
 +
-Now when we run our previously configured backup job *pacman-backup*, our blueprint will automatically run to pause database operations on our Pacman score database.
+Now when we run our previously configured backup job *kasten-lab-{user}-pacman*, our blueprint will automatically run to pause database operations on our Pacman score database.
 . Close the *Application Details* modul by clicking the *X* in the upper right corner and navigate to *Policies* using the left-hand pane.
-. Click *Run Once* on the *pacman-backup* policy
+. Click *Run Once* on the *kasten-lab-{user}-pacman* policy
 +
 .Run Pacman-Backup
 image::module02-lab03-blueprints/pacman-backup_runonce.png[Run Pacman-Backup]

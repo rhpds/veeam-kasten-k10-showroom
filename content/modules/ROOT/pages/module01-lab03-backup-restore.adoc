@@ -22,21 +22,27 @@ First you will create a new VM in a new project to use for the exercise.
 image::module01-lab03-backup_restore/01.png[]
 
 . Specify `kasten-lab-{user}` as the *_Name_* and click *_Create_*.
-. Select *_Virtualization → Virtual Machines_* from the sidebar, and click *_Create VirtualMachine → From template_* in the `kasten-lab-{user}` Project.
+. Select *_Virtualization → Virtual Machines_* from the sidebar, and click *_Create VirtualMachine -> From Instance Type_* in the `kasten-lab-{user}` Project.
 +
 image::module01-lab03-backup_restore/03.png[]
 +
 ====
 [NOTE]
 
-Kasten can be used to protect VMs provisioned using an `InstanceType` as well without any additional configuration. This capability was introduced in Kasten v7.5.0.
+Kasten can be used to protect VMs provisioned using a `Template` as well without any additional configuration.
 ====
 
-. Under *_Template catalog_*, select the `fedora-server-small` template.
+. Under *_Select Volume to boot from_*, select the `centos-stream9` volume.
++
+====
+[NOTE]
+
+If you do not see any bootable volumes, ensure you've selected `openshift-virtualization-os-images` for the *_Volumes Project_*
+====
 +
 image::module01-lab03-backup_restore/04.png[]
-
-. Update the *_VirtualMachine name_* to `fedora-k10` and click *_Quick create VirtualMachine_*.
+. Leave the default *_General Purpose_* InstanceType selected
+. Update the *_VirtualMachine name_* to `{user}-fedora` and click *_Create VirtualMachine_*.
 +
 image::module01-lab03-backup_restore/05.png[]
 +
@@ -46,7 +52,7 @@ image::module01-lab03-backup_restore/05.png[]
 This will provision the VM with preferred storage settings for the `{kasten_storageclass}` StorageClass, specifically *_Block VolumeMode_* to provide the *_ReadWriteMany_* access required to enable live migration between OpenShift nodes.
 ====
 
-. Validate the `fedora-k10-volume` PersistentVolumeClaim configuration from *_Storage → PersistentVolumeClaims_* in the sidebar.
+. Validate the `{user}-fedora-volume` PersistentVolumeClaim configuration from *_Storage → PersistentVolumeClaims_* in the sidebar.
 +
 image::module01-lab03-backup_restore/06.png[]
 
@@ -189,25 +195,27 @@ When performing many tasks within the Kasten UI, you can press the *_</> YAML_* 
 This can be useful for familiarizing yourself with the Kubernetes-native APIs defined by Kasten and for extracting snippets for use in GitOps or Infrastructure-as-Code tools.
 ====
 
-. Click *_Create Policy_*.
+. Click *_Submit_*.
 
 == 5. Freezing the Guest Filesystem
 
 Kasten can freeze the guest filesystem before the snapshot and unfreeze after the snapshot completes by either using the Virtual Machine dashboard within the Kasten web UI, or alternatively annotating the VirtualMachine resource with `k10.kasten.io/freezeVM=true`.
 
-. In the *_Web Terminal_*, enable filesystem freezing for `fedora-k10`:
+. In the *_Web Terminal_*, enable filesystem freezing for `{user}-fedora`:
 +
 [source,bash,role=execute,subs="attributes"]
 ----
-oc annotate virtualmachine fedora-k10 \
+oc annotate virtualmachine {user}-fedora \
   -n kasten-lab-{user} \
   k10.kasten.io/freezeVM=true
 ----
 +
 ====
 [NOTE]
+The above annotation can be managed via the Kasten web UI by navigating to the *_Virtual Machines_* Dashboard, selecting the checkbox next to the VMs you wish to enable, and selecting *_Enable Guest OS Freeze_*. The freeze and unfreeze operations will only be attempted if the VirtualMachine is in *_Running_* state.
+ 
+image::module01-lab03-backup_restore/14a.png[]
 
-The freeze and unfreeze operations will only be attempted if the VirtualMachine is in *_Running_* state.
 ====
 +
 ====
@@ -262,7 +270,7 @@ There is a backup for the application created within the last hour to satisfy th
 +
 image::module01-lab03-backup_restore/19.png[]
 
-. Select the most recent RestorePoint, and click the local version as shown below.
+. Select the most recent RestorePoint of type *_Snapshot_*, and click the local version as shown below.
 +
 image::module01-lab03-backup_restore/20.png[]
 +
@@ -287,7 +295,7 @@ image::module01-lab03-backup_restore/21a.png[]
 +
 You should expect this operation to complete rapidly (less than 2 minutes), as the VM volume is being restored from a local CSI VolumeSnapshot.
 
-. Once the *_Restore_* has completed, return to *_OpenShift Console → Virtualization → Virtual Machines_* and validate the `fedora-k10` VM is *_Running_*.
+. Once the *_Restore_* has completed, return to *_OpenShift Console → Virtualization → Virtual Machines_* and validate the `{user}-fedora` VM is *_Running_*.
 +
 image::module01-lab03-backup_restore/22.png[]
 +
@@ -298,7 +306,7 @@ You can also validate the source of the restored volume by running:
 
 [source,bash,role=execute,subs="attributes"]
 ----
-oc describe pvc fedora-k10 -n kasten-lab-{user}
+oc describe pvc {user}-fedora -n kasten-lab-{user}
 ----
 
 You should observe the volume's *_DataSource_* is a `+k10-csi-snap-...+` VolumeSnapshot, confirming the volume was restored from a local snapshot.
@@ -312,7 +320,7 @@ Often, local snapshot data may not be available, requiring that data be restored
 +
 [source,bash,role=execute,subs="attributes"]
 ----
-oc delete virtualmachine fedora-k10 -n kasten-lab-{user}
+oc delete virtualmachine {user}-fedora -n kasten-lab-{user}
 
 oc delete project kasten-lab-{user}
 ----
@@ -371,7 +379,7 @@ Unlike the local restore, the PVC populated by the Kasten datamover will not con
 
 [source,bash,role=execute,subs="attributes"]
 ----
-oc describe pvc fedora-k10 -n kasten-lab-clone-{user}
+oc describe pvc {user}-fedora -n kasten-lab-clone-{user}
 ----
 ====
 

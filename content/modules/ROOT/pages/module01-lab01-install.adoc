@@ -15,14 +15,16 @@ Make sure you follow the instructions to access the Kasten K10 Dashboard in <<ac
 [WARNING]
 
 While you do have access to the `kasten-io` namespace *PLEASE DO NOT MODIFY ANYTHING IN THAT NAMESPACE*. This namespace is shared by all lab participants and changing anything could break the lab for *everyone*!
+ +
+An dedicated namespace has been precreated for you named, *_backuptarget1-{user}_*
 ====
 
-. In the *_OpenShift Console_*, search for `Kasten` in the *_OperatorHub_* and select *_Kasten K10 (Free)_*:
+. In the *_OpenShift Console_*, search for `Kasten` in the *_OperatorHub_* and select *_Veeam Kasten_*:
 +
 image::module01-lab01-install/02.png[]
 +
 
-. Under *_Version_*, select `7.0.12` from the dropdown menu, and click *_Install_*.
+. Under *_Version_*, select `{k10_version}` from the dropdown menu, and click *_Install_*.
 +
 image::module01-lab01-install/02b.png[]
 +
@@ -78,7 +80,7 @@ A complete list of configuration parameters is available on https://docs.kasten.
 ====
 
 . Click *_Create_*.
-. Open the *_Web Terminal_* and click *_Start_* to initialize the terminal (if prompted).
+. Ensure you are in your user's namespace, *_backuptarget-{user}_*. Open the *_Web Terminal_* and click *_Start_* to initialize the terminal (if prompted).
 +
 image::module01-lab01-install/01.png[]
 

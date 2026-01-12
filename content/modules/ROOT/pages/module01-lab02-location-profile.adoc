@@ -50,8 +50,8 @@ image::module01-lab02-location-profile/002.png[]
 ====
 [NOTE]
 
-If this is the first time you are opening a terminal you may need to *Create a Project* first to run your terminal pod in. In that case make sure you use `terminal-{user}` as your project name to ensure that it is unique to you. Then click the blue *Start* button.
-
+Recall that you are limited to which namespaces you can create/modify/delete resources, which includes the pods required to spin up a terminal. Ensure that you use your users's namespace, `backuptarget-{user}` as your project name to ensure that it is unique to you. Then click the `>_` icon
+ 
 image::module01-lab02-location-profile/002a.png[]
 ====
 
@@ -124,9 +124,19 @@ image::module01-lab02-location-profile/02.png[]
 
 | *_Bucket_*
 | `kastenbackups-{user}`
+
+| *_Enable Immutable Backups_*
+|`Disabled`
 |===
 +
 image::module01-lab02-location-profile/02b.png[]
+
+====
+[NOTE]
+
+While we won't be using immutabile buckets for this lab, in a production environment this is something you'd certainly want to use, to ensure
+your backup data is safe from accidental deletion or ransomware attack!
+====
 
 . Click *_Next_* followed by *_Submit_* to create the Location Profile.
 +

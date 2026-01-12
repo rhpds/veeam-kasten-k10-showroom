@@ -16,12 +16,6 @@ However, Kasten also provides a user interface for providing consolidated observ
 
 _In this exercise you will configure Kasten Multi-cluster Manager, join a second cluster, and distribute a centrally managed location profile to both clusters._
 
-====
-[IMPORTANT]
-
-As each learner only has a single cluster, you will need to work with a partner, designating (1) user/cluster as `cluster-1` and (1) user/cluster as `cluster-2`.*
-====
-
 == 2. Configuring Primary Cluster
 
 ====
