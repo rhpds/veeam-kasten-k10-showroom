@@ -10,19 +10,20 @@ In this module, we will be deploying a containerized application. Ensure that yo
 ====
 . Add a new namespace for the Pacman application
 +
-[source,bash]
+[source,bash,role=execute,subs="attributes"]
 ----
-oc create namespace `kasten-lab-{user}-pacman`
+oc create namespace kasten-lab-{user}-pacman
 ----
 . Add the repository to install Pacman:
 +
-....
+[source,bash,role=execute,subs="attributes"]
+----
 helm repo add pacman https://michaelhaigh.github.io/pacman/
 helm repo update
-....
+----
 . Run the following to install the `pacman/pacman` Helm Chart:
 +
-[source,bash]
+[source,bash,role=execute,subs="attributes"]
 ----
 helm install pacman pacman/pacman -n kasten-lab-{user}-pacman \
 --set route.create=true \

@@ -35,7 +35,7 @@ image::module02-lab03-backup-recovery/action_completed.png[Action Completed]
 image::module02-lab03-backup-recovery/pacman_leaderboard.png[Leaderboard]
 . From the web terminal, drop the `pacman` database from MongoDB that holds your highscore:
 +
-[source,bash]
+[source,bash,role=execute,subs="attributes"]
 ----
 export MONGODB_ROOT_PASSWORD=$(oc get secret -n kasten-lab-{user}-pacman pacman-mongodb -o jsonpath="{.data.mongodb-root-password}" | base64 --decode)
 oc exec -it statefulset/pacman-mongodb -n kasten-lab-{user}-pacman -- mongosh pacman --authenticationDatabase admin -u root -p $MONGODB_ROOT_PASSWORD --eval 'db.dropDatabase();'
