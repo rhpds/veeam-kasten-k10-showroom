@@ -8,11 +8,23 @@
 
 In this module, we will be deploying a containerized application. Ensure that you create a new, different namespace than what you may have created in the previous module (`kasten-lab-{user}`) in the previous lab, we suggest kasten-lab-{user}-pacman. This will ensure that the application is isolated from the previous lab and can be easily managed.
 ====
+. If you haven't yet logged into the {openshift_console_url}[OpenShift console^] log into the console now.
+.. Your UserID is `{user}` with password `{password}`.
+. Open an OpenShift command line terminal
++
+====
+[NOTE]
+
+Recall that you are limited to which namespaces you can create/modify/delete resources, which includes the pods required to spin up a terminal. Ensure that you use your users's namespace, `backuptarget-{user}` as your project name to ensure that it is unique to you. Then click the `>_` icon
+ 
+image::module01-lab02-location-profile/002a.png[]
+====
+
 . Add a new namespace for the Pacman application
 +
 [source,bash,role=execute,subs="attributes"]
 ----
-oc create namespace kasten-lab-{user}-pacman
+oc new-project kasten-lab-{user}-pacman
 ----
 . Add the repository to install Pacman:
 +
@@ -57,7 +69,10 @@ image::module02-lab01-pacman/pacman_route.png[pacman route]
 ====
 [NOTE]
 
-If pacman doesn’t load in the browser, ensure that the address bar is using HTTP (http://pacman-route-pacman), _not_ HTTPS ++>++ Occasionally browsers may try to force you to an HTTPS page which will not work for our default pacman app
+If pacman doesn’t load in the browser, ensure that the address bar is using HTTP (http://pacman-route-kasten-lab-user1-pacman...), _not_ HTTPS ++>++ Occasionally browsers may try to force you to an HTTPS page which will not work for our default pacman app. Google Chrome can be stubborn, so after changing https to http in the address bar and hitting enter, you may need to perform a hard refresh.
+Alternatively, within the OpenShift console, you can edit the pacman route by clicking the three dots, selecting *_Edit Route_*, enabling *_Secure Route_* under *Security* and setting TLS termination to _Edge_ and Insecure Traffic to _Allow_:
+
+image::module02-lab01-pacman/secure_route.png[Secure route]
 ====
 . Play a short game, and enter your name once you’re done to add your name to the leaderboard.
 +
@@ -66,7 +81,11 @@ image::module02-lab01-pacman/pacman_game.png[pacman game]
 +
 .pacman leaderboard
 image::module02-lab01-pacman/pacman_leaderboard.png[pacman leaderboard]
+====
+[NOTE]
 
+If the leaderboard is blank, you may need to refresh your browser and click on *High Score* in the pacman menu to reload it
+====
 == 3. Takeaways
 
 * Deploying applications from helm charts is quick and easy

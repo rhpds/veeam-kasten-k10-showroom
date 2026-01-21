@@ -13,10 +13,8 @@ image::module02-lab03-backup-recovery/policy_run_once.png[Run Once]
 +
 .Run Once Continue
 image::module02-lab03-backup-recovery/run_once_continue.png[Run Once Continue]
-. Click *++<++ Dashboard* in the upper-left corner to monitor the action on the main dashboard
+. Click *Dashboard* in the left menu to monitor the action on the main dashboard
 +
-.Running Action
-image::module02-lab03-backup-recovery/running_action.png[Running Action]
 . Click on the running action to monitor its detailed status
 +
 .Action Details
@@ -33,7 +31,7 @@ image::module02-lab03-backup-recovery/action_completed.png[Action Completed]
 +
 .Leaderboard
 image::module02-lab03-backup-recovery/pacman_leaderboard.png[Leaderboard]
-. From the web terminal, drop the `pacman` database from MongoDB that holds your highscore:
+. Return to the OpenShift Console tab and from the web terminal, drop the `pacman` database from MongoDB that holds your highscore:
 +
 [source,bash,role=execute,subs="attributes"]
 ----

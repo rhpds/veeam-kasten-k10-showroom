@@ -83,7 +83,7 @@ Copy the Secret Key to a text editor as it will be needed again shortly.
 
 == 3. Creating an S3-Compatible Location Profile
 
-. In the *_Kasten Dashboard_*, select *_Profiles → Location_* from the sidebar and click *_+ Add New_*.
+. In the {kasten_dashboard}[Kasten Dashboard], select *_Profiles → Location_* from the sidebar and click *_+ Create New Profile_*.
 +
 image::module01-lab02-location-profile/01.png[]
 
@@ -185,7 +185,7 @@ image::module02-lab02-configure/09.png[]
 
 . Close the *_Application Details_* window.
 . Under `kasten-lab-{user}-pacman`, select *_...
-→ Create a Policy_*.
+→ Create Policy_*.
 +
 image::module02-lab02-configure/10.png[]
 
@@ -227,7 +227,7 @@ This can be configured under *_Advanced Export Settings_*.
 
 . Under *_Select Applications_*, verify the `kasten-lab-{user}-pacman` namespace has been selected.
 +
-image::module01-lab03-backup_restore/14.png[]
+image::module02-lab02-configure/pacman_policy.png[Pacman Policy]
 +
 ====
 [NOTE]
@@ -249,4 +249,4 @@ When performing many tasks within the Kasten UI, you can press the *_</> YAML_* 
 This can be useful for familiarizing yourself with the Kubernetes-native APIs defined by Kasten and for extracting snippets for use in GitOps or Infrastructure-as-Code tools.
 ====
 
-. Click *_Create Policy_*.
+. Click *_Submit_* to create the policy.
