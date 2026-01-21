@@ -84,7 +84,7 @@ Copy the Secret Key to a text editor as it will be needed again shortly.
 
 == 3. Creating an S3-Compatible Location Profile
 
-. In the *_Kasten Dashboard_*, select *_Profiles → Location_* from the sidebar and click *_+ Add New_*.
+. In the *_Kasten Dashboard_*, select *_Profiles → Location_* from the sidebar and click *_+ Create New Profile_*.
 +
 image::module01-lab02-location-profile/01.png[]
 
