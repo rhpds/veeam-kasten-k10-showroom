@@ -1,0 +1,8 @@
+= Appendix
+
+== 1. Introduction
+
+This section contains labs that cannot be executed by the user, due to the steps having already been automated during provisioning or
+constraints due to resources or connectivity. Nonetheless, they can be referenced as guides as to how to accomplish things such as
+installing Veeam Kasten from the Red Hat OpenShift operator, configuring multicluster, and migrating workloads across clusters.
+

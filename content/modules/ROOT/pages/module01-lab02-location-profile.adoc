@@ -2,7 +2,24 @@
 
 == 1. Introduction
 
-You have now configured everything required to perform a local snapshot of a Kubernetes application using Kasten - _but snapshots are not backup!_ In order to restore in the event the local cluster or primary storage is compromised, a copy of that data should be exported to another location.
+====
+[IMPORTANT]
+
+We have pre-staged the lab with an install of Veeam Kasten, so there's no need to complete the installation steps in Lab 1.
+Rather, this section just highlights how'd you go about installing Kasten if it were not already installed on the OpenShift cluster.
+ +
+Make sure you follow the instructions to access the Kasten K10 Dashboard in <<access-dashboard>> of this lab though!
+====
+
+====
+[WARNING]
+
+While you do have access to the `kasten-io` namespace *PLEASE DO NOT MODIFY ANYTHING IN THAT NAMESPACE*. This namespace is shared by all lab participants and changing anything could break the lab for *everyone*!
+ +
+An dedicated namespace has been precreated for you named, *_backuptarget1-{user}_*
+====
+
+As Kasten has been pre-deployed on the cluster, it can be used to take a local snapshot of an OpenShift application or VM using Kasten - _but snapshots are not backup!_ In order to restore in the event the local cluster or primary storage is compromised, a copy of that data should be exported to another location.
 
 The configuration of these backup targets are called *_Location Profiles_*.
 Kasten https://docs.kasten.io/latest/usage/configuration.html[supports several options], including:
