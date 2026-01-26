@@ -45,7 +45,7 @@ helm install pacman pacman/pacman -n kasten-lab-{user}-pacman \
 ----
 +
 _It will take a few moments for the command to return, this is normal!_
-. Return to the OpenShift Console in your browser and verify the Chart has successfully provisioned 3 Pods, `pacman-++*++` and `pacman-mongodb-++*++`
+. Return to the OpenShift Console in your browser and verify the Chart has successfully provisioned 2 Pods, `pacman-++*++` and `pacman-mongodb-++*++`
 +
 .pacman pods
 image::module02-lab01-pacman/pacman_pods.png[pacman pods]
