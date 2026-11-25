@@ -5,7 +5,7 @@
 
 
 [arabic]
-. Under Policies, click _run once_ on the policy you created in lab 2, entitled _pacman-backup_
+. Under *_Policies → Policies_*, click the *_..._* menu for the policy you created in lab 2, `kasten-lab-{user}-pacman-backup`, and select *_Run Once_*
 +
 .Run Once
 image::module02-lab03-backup-recovery/policy_run_once.png[Run Once]
@@ -57,22 +57,31 @@ image::module02-lab03-backup-recovery/no_highscores.png[no high scores]
 +
 .Compliant
 image::module02-lab03-backup-recovery/compliant.png[Compliant]
-. Click Restore on the Pacman application to restore from backup
+. Click the *_..._* menu for the `kasten-lab-{user}-pacman` application and select *_Restore_*
 +
 .Restore
 image::module02-lab03-backup-recovery/restore.png[Restore]
-. Click on the most recent snapshot's hamburger menu and select *_Restore_*
+. You will be taken to the *_Restore Points_* page, filtered to your application. Click the *_..._* menu for the most recent RestorePoint of type *_Snapshot_* and select *_Restore_*
++
+.Select Restore Point
+image::module02-lab03-backup-recovery/perform_restore.png[Select Restore Point]
 +
 ====
 [IMPORTANT]
- There are two options from which to restore. The top-most is the exported backup which is stored on our S3 object storage and the second top-most is local snapshot. In the event of an accidental deletion, restoring from local cluster backup is sufficient, but if we were facing the result of a ransomware attack we would likely want to restore from the S3 bucket. For the purposes of this lab, we’ll just the local cluster backup since restore time will be slightly faster
+There are two types of RestorePoint from which to restore. The *_Exported_* RestorePoint is stored on our S3 object storage, while the *_Snapshot_* RestorePoint is a local snapshot on the cluster. In the event of an accidental deletion, restoring from the local snapshot is sufficient, but if we were facing the result of a ransomware attack we would likely want to restore from the S3 bucket. For the purposes of this lab, we’ll use the local snapshot since restore time will be slightly faster.
 ====
-. Scroll down and click *Deselect All Artifacts* then click the tick box next to the _pacman-mongodb_ item under the _Snapshot (1)_ section
+. Under *_Optional Restore Settings_*, check *_Data-Only Restore_*
 +
-.Restore Volume
-image::module02-lab03-backup-recovery/volume_only_restore.png[Restore Volume]
+.Data-Only Restore
+image::module02-lab03-backup-recovery/volume_only_restore.png[Data-Only Restore]
++
+====
+[NOTE]
+A *_Data-Only Restore_* restores only the volume data for the existing workloads in the namespace - in this case the MongoDB PersistentVolumeClaim - without overwriting the Deployment, StatefulSet, Secrets, ConfigMaps, or other resources. 
+Alternatively, *_Volume-Clones Restore_* restores a timestamp-appended copy of the volumes alongside the existing ones, which is useful for recovering individual files without disrupting the running application.
+====
 . Click *Restore*.
-. Click *Restore* when prompted.
+. Click *Restore* when prompted to confirm restoring only data for the application.
 . Return to the Dashboard by clicking on the **Dashboard** link in the upper left corner
 . Click on the running Restore Action to monitor the action
 . After a minute or two all phases should complete successfully
@@ -87,9 +96,9 @@ image::module02-lab03-backup-recovery/pacman_leaderboard.png[Leaderboard]
 == 4. Takeaways
 
 * Kasten automatically interrogates and detects namespaces on the cluster
-* Backup jobs are configured on a per-namespace basis and can be configured quickly
+* Backup policies can be configured quickly on a per-namespace basis for containerized applications, or on a per-VM basis for Virtual Machines
 * We can easily monitor actions via the Kasten UI
 * We have granular control on how we restore from backup, including whether from on-cluster or exported storage
-* We have granular control over which components we wish to recover and/or overwrite
+* We have granular control over what we recover, such as restoring only volume data with a *_Data-Only Restore_*
 
 Continue to LAB 4

@@ -2,47 +2,59 @@
 
 == 1. Introduction
 
-In this exercise you will create and run a Kasten policy for protecting Virtual Machines running on OpenShift and test restoring from both local and remote backup sources.
+In this exercise you will create and run a Kasten *_Virtual Machine policy_* for protecting Virtual Machines running on OpenShift and test restoring from both local and remote backup sources.
 
 == 2. Creating a VM
 
-====
-[IMPORTANT]
-
-At the time of this lab's authoring, it is recommended to provision only one virtual machine per project/namespace to ensure that the Kasten datamover can efficiently export the VM data. +
- +
-In future releases, Kasten will support multiple VMs per project/namespace, but this is not yet available.
-====
-
 First you will create a new VM in a new project to use for the exercise.
 
-. In the *_OpenShift Console_*, navigate to *_Virtualization_* -> *_Virtual Machines_*.
-. To create a new project to work in select the *_Project_* menu and click *_Create Project_*.
+. In the *_OpenShift Console_*, navigate to *_Virtualization_* -> *_VirtualMachines_*.
+. To create a new project to work in, right-click *_Local cluster_* in the project tree and select *_Create project_*.
 +
 image::module01-lab03-backup_restore/01.png[]
 
 . Specify `kasten-lab-{user}` as the *_Name_* and click *_Create_*.
-. Select *_Virtualization → Virtual Machines_* from the sidebar, and click *_Create VirtualMachine -> From Instance Type_* in the `kasten-lab-{user}` Project.
++
+image::module01-lab03-backup_restore/02.png[]
+
+. With the `kasten-lab-{user}` project selected in the project tree, click *_Create_* to launch the *_Create VirtualMachine_* wizard.
++
+====
+[TIP]
+
+If you do not see your project in the tree, toggle off *_Show only projects with VirtualMachines_* and type `kasten-lab` in the *_Search projects_* field.
+====
+
+. On the *_Deployment details_* step, leave *_Custom configuration (default)_* selected, enter `{user}-fedora` as the *_Name_*, verify the *_Location_* is *_Project kasten-lab-{user}_*, and click *_Next_*.
 +
 image::module01-lab03-backup_restore/03.png[]
 +
 ====
 [NOTE]
 
-Kasten can be used to protect VMs provisioned using a `Template` as well without any additional configuration.
+Kasten can be used to protect VMs provisioned using a `Template` or cloned from an existing VM as well, without any additional configuration.
 ====
 
-. Under *_Select Volume to boot from_*, select the `fedora` volume.
+. On the *_Guest OS_* step, select *_Other Linux_*, choose `fedora` as the *_Guest operating system type_*, and click *_Next_*.
++
+image::module01-lab03-backup_restore/03a.png[]
+
+. On the *_Boot source_* step, leave *_Boot volume_* selected, select the `fedora` volume, and click *_Next_*.
++
+image::module01-lab03-backup_restore/04.png[]
 +
 ====
 [NOTE]
 
-If you do not see any bootable volumes, ensure you've selected `openshift-virtualization-os-images` for the *_Volumes Project_*
+If you do not see any bootable volumes, ensure *_All projects_* (or `openshift-virtualization-os-images`) is selected for the *_Volumes project_*.
 ====
+
+. On the *_Compute resources_* step, leave the default *_General Purpose (U series)_* `medium` size selected and click *_Next_*.
 +
-image::module01-lab03-backup_restore/04.png[]
-. Leave the default *_General Purpose_* InstanceType selected
-. Update the *_VirtualMachine name_* to `{user}-fedora` and click *_Create VirtualMachine_*.
+image::module01-lab03-backup_restore/04a.png[]
+
+. Leave the defaults on the *_Customization_* step and click *_Next_*.
+. On the *_Review and create_* step, verify *_Start this VirtualMachine after creation_* is checked and click *_Create VirtualMachine_*.
 +
 image::module01-lab03-backup_restore/05.png[]
 +
@@ -67,11 +79,11 @@ This is skipped in the lab exercise as the `openshift-storage.rbd.csi.ceph.com` 
 
 . Your `StorageClass` has already been set up to allow the Kasten datamover to export raw Block volumes using the `{kasten_storageclass}` StorageClass:
 +
-In the *_Web Terminal_*, run the following command to validate that the annotation is present (you should see an annotation starting with `k10.kastion.io`):
+In the *_Web Terminal_*, run the following command to validate that the annotation is present (you should see an annotation starting with `k10.kasten.io`):
 +
 [source,bash,role=execute,subs="attributes"]
 ----
-oc get sc {kasten_storageclass} -ojsonpath=='{.metadata.annotations}';echo
+oc get sc {kasten_storageclass} -ojsonpath='{.metadata.annotations}';echo
 ----
 +
 ====
@@ -95,7 +107,16 @@ While many Kubernetes backup solutions can orchestrate local CSI snapshots of a 
 Support for this capability does *NOT* exist in Velero or OADP today.
 ====
 
-== 4. Creating a Kasten Policy
+== 4. Creating a Kasten Virtual Machine Policy
+
+Traditionally, Kasten policies select *_applications_* by namespace (or by labels), capturing every resource in the namespace as a single RestorePoint.
+While this works well for containerized applications, it can be limiting for Virtual Machines - restoring a single VM from a namespace containing many VMs becomes more complex, and a failure protecting one VM can affect the others.
+
+Kasten *_Virtual Machine policies_* treat each `VirtualMachine` as a first-class object:
+
+* VMs are selected by namespace and VM name (including wildcards), or by labels on the `VirtualMachine` resource
+* Each VM gets its own RestorePoint, along with its automatically discovered dependencies (DataVolumes, PVCs, InstanceTypes, Preferences, Secrets, ConfigMaps, etc.)
+* Multiple VMs can live in the same namespace while still being protected, monitored, and restored individually
 
 . In the *_Kasten Dashboard_*, select *_Applications_* to view all discovered namespaces.
 +
@@ -105,8 +126,6 @@ Your `kasten-lab-{user}` application should appear as *_Unmanaged_*, indicating 
 +
 ====
 [TIP]
-
-You will notice that you don't see any namespaces starting with `openshift` in the list of applications.
 
 Namespaces, including the `+openshift-...+` system namespaces can be excluded from the *_Applications_* list (and compliance reporting) by adding a list of `excludedApps` to the K10 Operand `spec`, as shown:
 
@@ -119,21 +138,25 @@ The following command can be used to produce a properly formatted list of namesp
 oc get ns --no-headers=true | \
   awk 'BEGIN { print "  excludedApps:" } /^openshift/{print "  -",$1}'
 ----
-
-Your lab environment has already been configured to exclude system namespaces.
 ====
 
 . Click `kasten-lab-{user}` in the *_Applications_* list to view details about the workloads and additional resources discovered within the namespace.
+Note the `{user}-fedora` workload of type `virtualmachine`.
 +
 image::module01-lab03-backup_restore/09.png[]
 
 . Close the *_Application Details_* window.
-. Under `kasten-lab-{user}`, select *_...
-→ Create a Policy_*.
+. Select *_Virtual Machines_* from the sidebar.
++
+The *_Virtual Machines_* dashboard provides a cluster-wide view of every VM Kasten has discovered, including its namespace, status, whether guest filesystem freeze is enabled, and when it was last backed up.
 +
 image::module01-lab03-backup_restore/10.png[]
 
-. Leave the defaults for *_Name_* and *_Action_*.
+. Select *_Policies → Policies_* from the sidebar and click *_+ Create New Policy_*.
++
+image::module01-lab03-backup_restore/10a.png[]
+
+. Enter `kasten-lab-{user}-vm-backup` as the *_Policy Name_*, leave *_Snapshot_* selected as the *_Action_*, and select *_Hourly_* as the *_Backup Frequency_*.
 +
 image::module01-lab03-backup_restore/11.png[]
 +
@@ -143,7 +166,7 @@ image::module01-lab03-backup_restore/11.png[]
 Policy Presets provide the option of allowing administrators to define SLA-focused configurations to simplify self-service data protection for other users.
 ====
 
-. Leave the default *_Hourly Backup Frequency_* and *_Snapshot Retention_* values.
+. Leave the default *_Snapshot Retention_* values.
 +
 image::module01-lab03-backup_restore/12.png[]
 +
@@ -171,22 +194,58 @@ This ability to only export snapshot metadata can dramatically improve performan
 This can be configured under *_Advanced Export Settings_*.
 ====
 
-. Under *_Select Applications_*, verify the `kasten-lab-{user}` namespace has been selected.
+. Under *_Selection Type_*, select *_Virtual Machines_*.
++
+image::module01-lab03-backup_restore/13a.png[]
+
+. Under *_Select Virtual Machines_*, select *_By Namespace_*, then add `kasten-lab-{user}` under *_Specify VMs_*.
 +
 image::module01-lab03-backup_restore/14.png[]
++
+By default, *_All VMs_* - including any *_future_* VMs created in the namespace - will be protected by the policy.
+
+. Click *_Change_* next to *_All VMs_*, select *_Specify VMs_*, check `{user}-fedora`, and click *_Save (1 Selected)_*.
++
+image::module01-lab03-backup_restore/14b.png[]
 +
 ====
 [NOTE]
 
-Targeting application(s) based on namespace is generally the most straightforward method of defining a backup policy.
-However, Kasten also allows you to identify applications based on native Kubernetes labels.
-This is especially helpful if you have many VMs in a single namespace and only want to protect current and *_future_* VMs with a specific label on the `VirtualMachine` resource, such as `backup: gold` or `vm: prod`.
-
-Kasten also provides rich filtering capabilities to include or exclude resources based on Kubernetes *_API Group_*, *_API Version_*, *_Resource Type_*, *_Resource Name_*, and *_Labels_*.
-For example, you could exclude backup for *_Secrets_* resources where a label includes an indication that the secret is externally managed.
+Alternatively, selecting *_By Labels_* allows you to protect current and *_future_* VMs with a specific label on the `VirtualMachine` resource, such as `backup: gold` or `vm: prod`, across all namespaces or only within namespaces matching a pattern (ex. `prod-*`).
+The label selector is re-evaluated each time the policy runs.
 ====
 
-. Leave the remaining settings as default.
+. Under *_Select VM Resources_*, leave *_All VM Dependencies_* selected.
++
+image::module01-lab03-backup_restore/14c.png[]
++
+====
+[NOTE]
+
+Kasten automatically discovers the resources each VM depends on by following references in the `VirtualMachine` spec, such as DataVolumes, PVCs, InstanceTypes, Preferences, ConfigMaps, Secrets, and NetworkAttachmentDefinitions.
+
+*_Filter VM Dependencies_* allows you to include or exclude specific discovered dependencies, while *_Select Additional Resources_* allows you to include other namespaced resources not referenced by the VM, such as a `Service` or a detached PVC.
+====
+
+. Click the *_</> YAML_* button at the bottom of the form to view the native Kubernetes YAML that defines the policy.
++
+image::module01-lab03-backup_restore/14d.png[]
++
+Note the `selector` uses the `k10.kasten.io/virtualMachineRef` key with a value of `<namespace>/<vm-name>`.
+Wildcards are supported for the VM name (ex. `kasten-lab-{user}/*`).
+A label-based VM policy would instead look like:
++
+[source,yaml]
+----
+  selector:
+    matchExpressions:
+      - key: k10.kasten.io/virtualMachineNamespace
+        operator: In
+        values:
+          - "*"
+    matchLabels:
+      backup: gold
+----
 +
 ====
 [TIP]
@@ -195,27 +254,36 @@ When performing many tasks within the Kasten UI, you can press the *_</> YAML_* 
 This can be useful for familiarizing yourself with the Kubernetes-native APIs defined by Kasten and for extracting snippets for use in GitOps or Infrastructure-as-Code tools.
 ====
 
-. Click *_Submit_*.
+. Close the YAML window and click *_Submit_*.
 
 == 5. Freezing the Guest Filesystem
 
-Kasten can freeze the guest filesystem before the snapshot and unfreeze after the snapshot completes by either using the Virtual Machine dashboard within the Kasten web UI, or alternatively annotating the VirtualMachine resource with `k10.kasten.io/freezeVM=true`.
+Kasten freezes the guest filesystem before taking a snapshot of a *_Running_* VM and unfreezes it after the snapshot completes, using the QEMU guest agent (`fsfreeze` on Linux, VSS on Windows) to produce a consistent backup.
+Guest filesystem freeze is *_enabled by default_*, as shown in the *_Freeze Guest_* column of the *_Virtual Machines_* dashboard.
 
-. In the *_Web Terminal_*, enable filesystem freezing for `{user}-fedora`:
+. In the *_Kasten Dashboard_*, select *_Virtual Machines_* from the sidebar and click the *_..._* menu for `{user}-fedora`.
 +
-[source,bash,role=execute,subs="attributes"]
-----
-oc annotate virtualmachine {user}-fedora \
-  -n kasten-lab-{user} \
-  k10.kasten.io/freezeVM=true
-----
+image::module01-lab03-backup_restore/14a.png[]
++
+Selecting *_Disable guest OS Freeze_* would disable filesystem freezing for the VM.
+Freeze can also be enabled or disabled for multiple VMs at once by selecting their checkboxes and using the *_Actions_* menu.
+*_Leave guest filesystem freeze enabled for this lab._*
 +
 ====
 [NOTE]
-The above annotation can be managed via the Kasten web UI by navigating to the *_Virtual Machines_* Dashboard, selecting the checkbox next to the VMs you wish to enable, and selecting *_Enable Guest OS Freeze_*. The freeze and unfreeze operations will only be attempted if the VirtualMachine is in *_Running_* state.
- 
-image::module01-lab03-backup_restore/14a.png[]
 
+The UI manages the `k10.kasten.io/freezeVM` annotation on the `VirtualMachine` resource.
+The same result can be achieved from the command line (you don't need to execute this):
+
+[source,bash,subs="attributes"]
+----
+oc annotate virtualmachine {user}-fedora \
+  -n kasten-lab-{user} \
+  k10.kasten.io/freezeVM=false
+----
+
+The annotation can also be applied to a namespace, in which case all VMs in the namespace inherit the setting unless individually annotated.
+If the freeze operation fails, Kasten falls back to a crash-consistent snapshot and records the event as an exception.
 ====
 +
 ====
@@ -229,7 +297,7 @@ This can be overridden using the `kubeVirtVMs.snapshot.unfreezeTimeout` Helm/Ope
 
 Rather than wait until the top of the hour for the policy to run, you can manually initiate a policy run programmatically or via the UI.
 
-. In *_Kasten Dashboard → Policies → Policies_*, click *_Run Once_* for the `kasten-lab-backup-{user}` Policy.
+. In *_Kasten Dashboard → Policies → Policies_*, click the *_..._* menu for the `kasten-lab-{user}-vm-backup` Policy and select *_Run Once_*.
 +
 image::module01-lab03-backup_restore/15.png[]
 
@@ -238,11 +306,12 @@ image::module01-lab03-backup_restore/15.png[]
 image::module01-lab03-backup_restore/16.png[]
 
 . Select *_Dashboard_* from the sidebar.
-. Under *_Actions_*, select the `kasten-lab-backup-{user}` Policy Run to monitor status.
+. Under *_Actions_*, select the `kasten-lab-{user}-vm-backup` Policy Run to monitor status.
 +
 image::module01-lab03-backup_restore/17.png[]
 +
 Click into each individual *_Action_* to view to associated details, including YAML, a complete list of the application metadata and volume snapshots protected, and how much volume data was transferred by the Kasten datamover to the Location Profile.
+Notice that the *_Backup_* action lists the *_Virtual Machine_* that was protected - with a VM policy, Kasten creates a separate *_Backup_* and *_Export_* action for each VM selected by the policy.
 +
 image::module01-lab03-backup_restore/18.png[]
 
@@ -260,21 +329,22 @@ image::module01-lab03-backup_restore/18b.png[]
 
 When performing an in-place restore on the application's original cluster, choosing the local RestorePoint provides the most rapid recovery as it uses the snapshot data already present on primary storage, rather than having to depend on data which must be transferred from the remote repository.
 
-. In the *_Kasten Dashboard_*, select *_Applications_* from the sidebar.
+. In the *_Kasten Dashboard_*, select *_Virtual Machines_* from the sidebar.
 +
-You should observe that the `kasten-lab-{user}` *_Status_* has changed to *_Compliant_*, indicating that the application is compliant with the backup SLA defined in the policy (i.e.
-There is a backup for the application created within the last hour to satisfy the hourly policy frequency).
+You should observe that the *_Last Backup_* column for `{user}-fedora` now displays the time of your policy run.
 
-. Under `kasten-lab-{user}`, select *_...
-→ Restore_*.
+. Click the *_..._* menu for `{user}-fedora` and select *_Restore_*.
 +
 image::module01-lab03-backup_restore/19.png[]
++
+You will be taken to the *_Restore Points_* page, filtered to the *_Virtual Machine_* application type and your `{user}-fedora` VM.
+Each policy run produces a local *_Snapshot_* RestorePoint and an *_Exported_* RestorePoint in the `kastenbackups-{user}` Location Profile.
 
-. Select the most recent RestorePoint of type *_Snapshot_*, and click the local version as shown below.
+. Click the *_..._* menu for the most recent RestorePoint of type *_Snapshot_* and select *_Restore_*.
 +
 image::module01-lab03-backup_restore/20.png[]
 +
-You should observe by default the selected RestorePoint includes all resources captured as part of the backup will be restored to its original namespace - with options to perform a more granular restore and/or modify the target namespace.
+You should observe by default the selected RestorePoint will be restored to its original namespace - with options to restore to a new namespace, perform a data-only restore, or preserve the VM's original MAC addresses.
 
 . Keep the default settings and click *_Restore_* to begin a full, in-place restore.
 +
@@ -287,7 +357,7 @@ Kasten will terminate the running VM and overwrite the existing resources.
 However, any resources in the namespace that do not exist in the RestorePoint will not be altered (protecting against unintentional data loss).
 ====
 
-. Confirm the restore action by validating the application and click *_Restore_*.
+. Confirm the restore action by clicking *_Restore_*.
 +
 image::module01-lab03-backup_restore/21a.png[]
 
@@ -295,7 +365,31 @@ image::module01-lab03-backup_restore/21a.png[]
 +
 You should expect this operation to complete rapidly (less than 2 minutes), as the VM volume is being restored from a local CSI VolumeSnapshot.
 
-. Once the *_Restore_* has completed, return to *_OpenShift Console → Virtualization → Virtual Machines_* and validate the `{user}-fedora` VM is *_Running_*.
+. Once the *_Restore_* has completed, return to *_OpenShift Console → Virtualization → VirtualMachines_*, select the `kasten-lab-{user}` project in the tree, and click the *_Virtual machines_* tab.
++
+You will notice the `{user}-fedora` VM has been restored in a *_Stopped_* state.
++
+====
+[NOTE]
+
+The power state of a restored VM depends on its `spec.runStrategy`.
+During an in-place restore, Kasten shuts down the running VM before overwriting its resources.
+VMs created through the OpenShift Console default to `runStrategy: RerunOnFailure`, which only restarts a VM after a failure - not after a clean shutdown - so the VM remains *_Stopped_* once the restore completes.
+VMs using `runStrategy: Always` are started automatically, while `Halted` and `Manual` VMs are always left stopped.
+
+You can check the run strategy of your VM by running:
+
+[source,bash,role=execute,subs="attributes"]
+----
+oc get vm {user}-fedora -n kasten-lab-{user} -o jsonpath='{.spec.runStrategy}';echo
+----
+====
+
+. Click the *_..._* menu for `{user}-fedora` and select *_Control → Start_*.
++
+image::module01-lab03-backup_restore/21b.png[]
+
+. Validate the `{user}-fedora` VM is *_Running_*.
 +
 image::module01-lab03-backup_restore/22.png[]
 +
@@ -306,7 +400,7 @@ You can also validate the source of the restored volume by running:
 
 [source,bash,role=execute,subs="attributes"]
 ----
-oc describe pvc {user}-fedora -n kasten-lab-{user}
+oc describe pvc {user}-fedora-volume -n kasten-lab-{user}
 ----
 
 You should observe the volume's *_DataSource_* is a `+k10-csi-snap-...+` VolumeSnapshot, confirming the volume was restored from a local snapshot.
@@ -330,26 +424,27 @@ oc delete project kasten-lab-{user}
 
 _"Snapshots are not backup."_              ~ Mark Twain
 
-VolumeSnapshots are namespaced resources.
-Removing the `kasten-lab-{user}` namespace will delete the VolumeSnapshots associated with your local RestorePoints.
-Additionally, the `ocs-storagecluster-rbdplugin-snapclass` VolumeSnapshotClass sets `deletionPolicy: Delete` by default, meaning that deletion of the VolumeSnapshot resource results in the removal of the snapshot within Ceph.
+Local snapshots live on the same primary storage as the workload they protect.
+If the cluster, the storage system, or the snapshots themselves are lost or compromised, only a copy exported to a separate Location Profile can be used for recovery.
+In this exercise you will simulate that scenario by deleting the VM and its namespace and restoring exclusively from the *_Exported_* RestorePoint.
 ====
 
-. In the *_Kasten Dashboard_*, select *_Applications_* from the sidebar.
+. In the *_Kasten Dashboard_*, select *_Virtual Machines_* from the sidebar.
 +
-You should observe that `kasten-lab-{user}` no longer appears in the list of applications as the namespace no longer exists on the cluster.
+You should observe that `{user}-fedora` no longer appears in the list as the VM no longer exists on the cluster.
 
-. Click the *_All_* dropdown menu and select *_Removed_* to view the list of non-existent namespaces with available RestorePoints.
+. Select *_Restore Points_* from the sidebar and select *_Virtual Machine_* as the *_Application type_*.
 +
 image::module01-lab03-backup_restore/23.png[]
++
+RestorePoints for the deleted `{user}-fedora` VM are still available even though the VM and its namespace no longer exist on the cluster.
+You may also see an additional pair of RestorePoints if the hourly policy schedule has run since your manual backup.
 
-. Under `kasten-lab-{user}`, select *_...
-→ Restore_*.
-. Select the most recent RestorePoint, and click the *_EXPORTED_* version as shown below.
+. Click the *_..._* menu for the most recent *_Exported_* RestorePoint and select *_Restore_*.
 +
 image::module01-lab03-backup_restore/24.png[]
 
-. Under *_Application Name_*, click *_+ Create New Namespace_*.
+. Under *_Namespace_*, click *_Create A New Namespace_*.
 . Specify `kasten-lab-clone-{user}` as the *_New Namespace_* and click *_Create_*.
 +
 image::module01-lab03-backup_restore/25.png[]
@@ -357,7 +452,7 @@ image::module01-lab03-backup_restore/25.png[]
 ====
 [WARNING]
 
-Make sure to click the green *_Create_* button to create the new namespace!
+Make sure to click the *_Create_* button to create the new namespace!
 ====
 
 . Click *_Restore_*, then in the confirmation dialog click *_Restore_* again.
@@ -368,9 +463,17 @@ image::module01-lab03-backup_restore/25a.png[]
 +
 image::module01-lab03-backup_restore/26.png[]
 
-. Return to *_OpenShift Console → Virtualization → VirtualMachines_* and observe the `fedora-k10` VirtualMachine now running in the `kasten-lab-clone-{user}` namespace.
+. Once the *_Restore_* has completed, return to *_OpenShift Console → Virtualization → VirtualMachines_* and select the `kasten-lab-clone-{user}` project.
+Observe the `{user}-fedora` VirtualMachine now running in the `kasten-lab-clone-{user}` namespace.
 +
 image::module01-lab03-backup_restore/27.png[]
++
+====
+[NOTE]
+
+Unlike the in-place restore, restoring to a new namespace creates a brand new `VirtualMachine` resource, so a `RerunOnFailure` VM is started automatically.
+If your VM shows as *_Stopped_*, click the *_..._* menu and select *_Control → Start_*.
+====
 +
 ====
 [NOTE]
@@ -379,7 +482,7 @@ Unlike the local restore, the PVC populated by the Kasten datamover will not con
 
 [source,bash,role=execute,subs="attributes"]
 ----
-oc describe pvc {user}-fedora -n kasten-lab-clone-{user}
+oc describe pvc {user}-fedora-volume -n kasten-lab-clone-{user}
 ----
 ====
 
@@ -389,7 +492,9 @@ _Congratulations on having protected and restored your first workload using Veea
 
 * Kasten runs on the cluster and can be deployed via OperatorHub or Helm chart
 * Kasten supports multiple authentication options (Tokens, OIDC, LDAP, OpenShift OAuth) and Kubernetes-native RBAC for controlling access and providing per-namespace self-service
-* Kasten can backup data to S3, Azure Blob, Google Cloud Storage, NFS, and Veeam Backup & Replication
+* Kasten can backup data to S3, Azure Blob, Google Cloud Storage, NFS/SMB, Veeam Data Cloud Vault, and Veeam Backup & Replication
 * Immutable backup support prevents unintended or malicious attempts to delete backup data, providing critical protection against ransomware
+* Kasten *_Virtual Machine policies_* protect each VM - and its automatically discovered dependencies - as a first-class object with its own RestorePoints, selected by name, wildcard, or label
+* Guest filesystem freeze is enabled by default to provide consistent VM backups
 * `Block` mode volumes can provide `ReadWriteMany` access using Ceph RBD, the most performant option for enabling Live Migration of OpenShift Virtual Machines
 * Kasten performs always incremental backups with support for both `Filesystem` and `Block` mode volumes

@@ -15,7 +15,7 @@ In this module, we will be deploying a containerized application. Ensure that yo
 ====
 [NOTE]
 
-Recall that you are limited to which namespaces you can create/modify/delete resources, which includes the pods required to spin up a terminal. Ensure that you use your users's namespace, `backuptarget-{user}` as your project name to ensure that it is unique to you. Then click the `>_` icon
+Recall that you are limited to which namespaces you can create/modify/delete resources, which includes the pods required to spin up a terminal. Ensure that you select your user's namespace, `backuptarget-{user}`, in the *_Project_* drop-down so that the terminal is unique to you. Then click the `>_` icon and click *_Start_* to initialize the terminal.
  
 image::module01-lab02-location-profile/002a.png[]
 ====
@@ -69,8 +69,8 @@ image::module02-lab01-pacman/pacman_route.png[pacman route]
 ====
 [NOTE]
 
-If pacman doesn’t load in the browser, ensure that the address bar is using HTTP (http://pacman-route-kasten-lab-user1-pacman...), _not_ HTTPS ++>++ Occasionally browsers may try to force you to an HTTPS page which will not work for our default pacman app. Google Chrome can be stubborn, so after changing https to http in the address bar and hitting enter, you may need to perform a hard refresh.
-Alternatively, within the OpenShift console, you can edit the pacman route by clicking the three dots, selecting *_Edit Route_*, enabling *_Secure Route_* under *Security* and setting TLS termination to _Edge_ and Insecure Traffic to _Allow_:
+If pacman doesn’t load in the browser, ensure that the address bar is using HTTP (http://pacman-route-kasten-lab-{user}-pacman...), _not_ HTTPS. Modern browsers, including Google Chrome, will often automatically upgrade the connection to HTTPS, which will not work for our default pacman route.
+The most reliable fix is to edit the pacman route within the OpenShift console by clicking the three dots, selecting *_Edit Route_*, enabling *_Secure Route_* under *Security*, setting *_TLS termination_* to _Edge_ and *_Insecure traffic_* to _Allow_, and clicking *_Save_*:
 
 image::module02-lab01-pacman/secure_route.png[Secure route]
 ====

@@ -185,11 +185,11 @@ image::module02-lab02-configure/09.png[]
 
 . Close the *_Application Details_* window.
 . Under `kasten-lab-{user}-pacman`, select *_...
-→ Create Policy_*.
+→ Create a Policy_*.
 +
 image::module02-lab02-configure/10.png[]
 
-. Leave the defaults for *_Name_* and *_Action_*.
+. Leave the defaults for *_Policy Name_* (`kasten-lab-{user}-pacman-backup`), *_Action_* (*_Snapshot_*), and *_Backup Frequency_* (*_Hourly_*).
 +
 image::module02-lab02-configure/11.png[]
 +
@@ -199,7 +199,7 @@ image::module02-lab02-configure/11.png[]
 Policy Presets provide the option of allowing administrators to define SLA-focused configurations to simplify self-service data protection for other users.
 ====
 
-. Leave the default *_Hourly Backup Frequency_* and *_Snapshot Retention_* values.
+. Leave the default *_Snapshot Retention_* values.
 +
 image::module01-lab03-backup_restore/12.png[]
 +
@@ -225,16 +225,16 @@ This ability to only export snapshot metadata can dramatically improve performan
 This can be configured under *_Advanced Export Settings_*.
 ====
 
-. Under *_Select Applications_*, verify the `kasten-lab-{user}-pacman` namespace has been selected.
+. Under *_Selection Type_*, verify *_Namespaces_* is selected, with *_By Name_* and the `kasten-lab-{user}-pacman` application listed under *_Applications_*.
 +
 image::module02-lab02-configure/pacman_policy.png[Pacman Policy]
 +
 ====
 [NOTE]
 
-Targeting application(s) based on namespace is generally the most straightforward method of defining a backup policy.
-However, Kasten also allows you to identify applications based on native Kubernetes labels.
-This is especially helpful if you have many VMs in a single namespace and only want to protect current and *_future_* VMs with a specific label on the `VirtualMachine` resource, such as `backup: gold` or `vm: prod`.
+Targeting application(s) based on namespace is generally the most straightforward method of defining a backup policy for containerized workloads.
+However, Kasten also allows you to identify applications based on native Kubernetes labels applied to a Namespace, Deployment, or StatefulSet.
+For Virtual Machines, the *_Virtual Machines_* selection type (covered in Module 1) protects each VM individually by name, wildcard, or label.
 
 Kasten also provides rich filtering capabilities to include or exclude resources based on Kubernetes *_API Group_*, *_API Version_*, *_Resource Type_*, *_Resource Name_*, and *_Labels_*.
 For example, you could exclude backup for *_Secrets_* resources where a label includes an indication that the secret is externally managed.

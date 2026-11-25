@@ -33,7 +33,7 @@ The good news is our Pacman application leverages an underlying Bitnami instance
 === Create a New Blueprint
 
 [arabic]
-. Within the Kasten UI, navigate to *Blueprints  Blueprints* in the side menu
+. Within the Kasten UI, navigate to *Blueprints → Blueprints* in the side menu
 +
 .Blueprints UI
 image::module02-lab04-blueprints/blueprint_ui.png[Blueprints UI]
@@ -101,10 +101,10 @@ actions:
 +
 .Validate and Save
 image::module02-lab04-blueprints/validate-and-save.png[Validate and Save]
-. A new Blueprint named `mongo-hooks` should appear within the *Blueprints* list
+. A new Blueprint named `mongo-hooks` should appear within the *Blueprints* list, along with the `backupPrehook` and `backupPosthook` actions it defines
 +
 .Blueprints List
-image::module02-lab04-blueprints/blueprint_bindings_list.png[Blueprints List]
+image::module02-lab04-blueprints/blueprints_list.png[Blueprints List]
 
 == 3. Binding our Blueprint
 
@@ -114,6 +114,7 @@ Now that we have created our *Blueprint* we need to bind it to our application s
 . Using the side menu, navigate to *Blueprints* -> *Bindings*
 +
 .Blueprint Bindings UI
+image::module02-lab04-blueprints/blueprint_bindings_ui.png[Blueprint Bindings UI]
 . Click *{plus} Create New Binding*
 . Specify the following:
 +
@@ -122,26 +123,29 @@ Now that we have created our *Blueprint* we need to bind it to our application s
 |*Blueprint Name* | mongo-hooks |
 |*Enable Blueprint Binding* | [checked] |
 |===
++
+.Blueprint Binding Configuration
+image::module02-lab04-blueprints/blueprint_binding_form.png[Blueprint Binding Configuration]
 . Click *Next*
 . We’ll now specify a constraint to ensure that our blueprint is bound to our application. We’ll use a simple "`*Match All Constraints*`" constraint to apply our blueprint to our pacman application via namespace. Click *Add New Constraint* and select *Namespace* in the drop-down list:
 +
 .Blueprint Constraints
 image::module02-lab04-blueprints/blueprint_constraints.png[Blueprint Constraints]
-. Leave the default Operator of *In* and specify the namespace *kasten-lab-{user}-pacman*
+. Leave the default Operator of *In* and select the namespace *kasten-lab-{user}-pacman* under *Values*
 . Still in the *Match All Constraints* pane, click *Add New Constraint* and select *Type*
 +
 .Add New Constraint
 image::module02-lab04-blueprints/blueprint_add_new_constraint.png[Add New Constraint]
-. Leave the default Operator of *In* and specify *Type*
+. Leave the default Operator of *In*
 . For the *Type* Constraint, specify the following:
 +
 |===
 |*Group* | leave blank |
 |*Version* | leave blank |
-|*Resource* | statefulsets |
+|*Resource* | select `statefulsets` |
 |*Name* | pacman-mongodb |
 |===
-. Click *Next*
+. Click *Next* to review the *Summary* of the binding. Click *_</> Show YAML_* to view the `BlueprintBinding` resource that will be created, then close the YAML window.
 +
 image::module02-lab04-blueprints/blueprint_binding_confirm.png[Confirm Blueprint Binding]
 +
@@ -159,9 +163,9 @@ Rather than use bindings via the UI, we could simply annotate the deployment to 
 .Pacman-MongoDB Binding
 image::module02-lab04-blueprints/pacman-mongodb-binding.png[Pacman-MongoDB Binding]
 +
-Now when we run our previously configured backup job *kasten-lab-{user}-pacman*, our blueprint will automatically run to pause database operations on our Pacman score database.
+Now when we run our previously configured backup policy *kasten-lab-{user}-pacman-backup*, our blueprint will automatically run to pause database operations on our Pacman score database.
 . Close the *Application Details* modul by clicking the *X* in the upper right corner and navigate to *Policies* using the left-hand pane.
-. Click *Run Once* on the *kasten-lab-{user}-pacman* policy
+. Click the *_..._* menu for the *kasten-lab-{user}-pacman-backup* policy and select *Run Once*
 +
 .Run Pacman-Backup
 image::module02-lab04-blueprints/pacman-backup_runonce.png[Run Pacman-Backup]
@@ -171,6 +175,15 @@ image::module02-lab04-blueprints/pacman-backup_runonce.png[Run Pacman-Backup]
 +
 .Pacman Backup Completed
 image::module02-lab04-blueprints/pacman-backup_completed.png[Pacman Backup Completed]
+. To confirm the blueprint hooks were executed, return to the *_Web Terminal_* and search the MongoDB logs for the lock and unlock operations:
++
+[source,bash,role=execute,subs="attributes"]
+----
+oc logs statefulset/pacman-mongodb -n kasten-lab-{user}-pacman --since=10m | \
+  grep -ioE '"(fsyncLock|fsyncUnlock)[^,]*'
+----
++
+You should see `fsyncLock` entries logged before the snapshot and an `fsyncUnlock complete` entry after it, confirming the database was quiesced while Kasten took the snapshot.
 
 == 4. Takeaways
 

@@ -9,7 +9,7 @@ asciidoc:
   attributes:
     lab_name: Backup/DR/Mobility with Veeam Kasten
     release-version: master
-    k10_version: 8.0.15
+    k10_version: 9.0.10
     page-pagination: true
     kasten_storageclass: ocs-external-storagecluster-ceph-rbd
     mongodb_root_password: testpass

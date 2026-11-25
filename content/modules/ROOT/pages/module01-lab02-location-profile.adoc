@@ -16,7 +16,7 @@ Make sure you follow the instructions to access the Kasten K10 Dashboard in <<ac
 
 While you do have access to the `kasten-io` namespace *PLEASE DO NOT MODIFY ANYTHING IN THAT NAMESPACE*. This namespace is shared by all lab participants and changing anything could break the lab for *everyone*!
  +
-An dedicated namespace has been precreated for you named, *_backuptarget1-{user}_*
+A dedicated namespace has been precreated for you named, *_backuptarget-{user}_*
 ====
 
 As Kasten has been pre-deployed on the cluster, it can be used to take a local snapshot of an OpenShift application or VM using Kasten - _but snapshots are not backup!_ In order to restore in the event the local cluster or primary storage is compromised, a copy of that data should be exported to another location.
@@ -24,16 +24,18 @@ As Kasten has been pre-deployed on the cluster, it can be used to take a local s
 The configuration of these backup targets are called *_Location Profiles_*.
 Kasten https://docs.kasten.io/latest/usage/configuration.html[supports several options], including:
 
-* AWS S3
-* Azure Blob
+* Veeam Data Cloud Vault (AWS and Azure)
+* Veeam Repository (Veeam Backup & Replication)
+* Amazon S3
+* Azure Storage
 * Google Cloud Storage
+* NFS/SMB
 * S3-Compatible
-* NFS
-* Veeam Backup & Recovery
 
 Kasten supports the creation of immutable backups to ensure that, as a last line of defense against ransomware, backup data cannot be manipulated or deleted by any user.
 These backups are supported on the following platforms:
 
+* Veeam Data Cloud Vault
 * AWS S3
 * S3-Compatible with Object Lock support (ex.
 Ceph, MinIO, Wasabi, etc.)
@@ -67,7 +69,7 @@ image::module01-lab02-location-profile/002.png[]
 ====
 [NOTE]
 
-Recall that you are limited to which namespaces you can create/modify/delete resources, which includes the pods required to spin up a terminal. Ensure that you use your users's namespace, `backuptarget-{user}` as your project name to ensure that it is unique to you. Then click the `>_` icon
+Recall that you are limited to which namespaces you can create/modify/delete resources, which includes the pods required to spin up a terminal. Ensure that you select your user's namespace, `backuptarget-{user}`, in the *_Project_* drop-down so that the terminal is unique to you. Then click the `>_` icon and click *_Start_* to initialize the terminal.
  
 image::module01-lab02-location-profile/002a.png[]
 ====
@@ -131,7 +133,7 @@ image::module01-lab02-location-profile/02.png[]
 | Paste `SECRET KEY` value
 
 | *_Endpoint_*
-| `{kasten_backup_bucket_host}`
+| `https://{kasten_backup_bucket_host}`
 
 | *_Skip certificate chain and hostname verification_*
 | `Checked`
